@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - VBQ Payment{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Data from Flask
+        const kpiData = {{ kpi_data | tojson }};
+        const monthlyData = {{ monthly_data | tojson }};
+        const deptData = {{ dept_budget_data | tojson }};
+        const supplierData = {{ supplier_data | tojson }};
+        
+        // KPI Cards
+        document.getElementById('totalDisbursed').textContent = kpiData.total_disbursed_display;
+        document.getElementById('disbursementRate').textContent = kpiData.disbursement_rate + '%';
+        document.getElementById('rejectionRate').textContent = kpiData.rejection_rate + '%';
+        document.getElementById('avgApprovalTime').textContent = kpiData.avg_approval_time + ' giờ';
+        
+        // Trend Line Chart
+        const months = monthlyData.map(m => m.month);
+        const actualValues = monthlyData.map(m => m.amount / 1000000);
+        
+        new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Chi tiêu thực tế (Triệu VNĐ)',
+                    data: actualValues,
+                    borderColor: '#0D6EFD',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true },
+                    title: {
+                        display: true,
+                        text: 'Xu hướng chi tiêu theo tháng'
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        
+        // Department Heatmap Table
+        const deptTable = document.getElementById('deptHeatmap');
+        let deptHtml = '';
+        for (const dept in deptData) {
+            const d = deptData[dept];
+            const percent = Math.round((d.used / d.budget) * 100);
+            let badgeClass = 'bg-success';
+            let icon = '✓';
+            if (percent >= 85) { badgeClass = 'bg-danger'; icon = '⚠'; }
+            else if (percent >= 70) { badgeClass = 'bg-warning'; icon = '⚡'; }
+            
+            deptHtml += `<tr>
+                <td><strong>${dept}</strong></td>
+                <td>${d.used_display}</td>
+                <td>${d.budget_display}</td>
+                <td>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar ${badgeClass}" style="width: ${percent}%">${percent}%</div>
+                    </div>
+                </td>
+                <td>${icon} ${percent}%</td>
+            </tr>`;
+        }
+        deptTable.innerHTML = deptHtml;
+    });
+</script>
+<style>
+
+{% endblock %}
+
+{% block content %}
+{% set active_page = 'dashboard' %}
+
+<div class="header">
+    <h2><i class="fas fa-chart-line"></i> Dashboard Chiến lược</h2>
+    <p>Theo dõi KPI và xu hướng tài chính</p>
+</div>
+
+<!-- KPI Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color: #0D6EFD;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="label">Tổng đã giải ngân</div>
+                    <div class="value" id="totalDisbursed">-</div>
+                </div>
+                <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color: #0DCAF0;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="label">Tỷ lệ giải ngân</div>
+                    <div class="value" id="disbursementRate">-</div>
+                </div>
+                <div class="icon"><i class="fas fa-chart-pie"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color: #DC3545;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="label">Tỷ lệ từ chối</div>
+                    <div class="value" id="rejectionRate">-</div>
+                </div>
+                <div class="icon"><i class="fas fa-times-circle"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color: #20C997;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="label">TB thời gian duyệt</div>
+                    <div class="value" id="avgApprovalTime">-</div>
+                </div>
+                <div class="icon"><i class="fas fa-clock"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trend Chart -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Xu hướng chi tiêu theo tháng
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Overview & Department Status -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Tổng quan hệ thống
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h3 class="text-primary">{{ total_requests }}</h3>
+                        <small>Tổng yêu cầu</small>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-warning">{{ pending_requests }}</h3>
+                        <small>Chờ duyệt</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h3 class="text-success">{{ approved_requests }}</h3>
+                        <small>Đã duyệt</small>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-danger">{{ rejected_requests }}</h3>
+                        <small>Từ chối</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <h4 class="text-primary">{{ total_amount_display }}</h4>
+                    <small>Tổng giá trị yêu cầu</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-fire"></i> Tình trạng phân bố theo khoa/phòng
+            </div>
+            <div class="card-body" style="min-height: 320px;">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Khoa/Phòng</th>
+                            <th>Đã dùng</th>
+                            <th>Ngân sách</th>
+                            <th>Tỷ lệ</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deptHeatmap"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

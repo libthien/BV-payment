@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Phê duyệt chi tiết - VBQ Payment{% endblock %}
+
+{% block content %}
+{% set active_page = 'approval' %}
+
+<div class="header">
+    <h2><i class="fas fa-clipboard-check"></i> Phê duyệt yêu cầu</h2>
+    <p>Mã yêu cầu: {{ request_obj.id }}</p>
+</div>
+
+<a href="{{ url_for('approval_list') }}" class="btn btn-secondary mb-3">
+    <i class="fas fa-arrow-left"></i> Quay lại
+</a>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Thông tin yêu cầu
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Mã yêu cầu</small>
+                        <p class="fw-bold">{{ request_obj.id }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Người yêu cầu</small>
+                        <p>{{ request_obj.creator_name }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Phòng ban</small>
+                        <p>{{ request_obj.department }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Nhà cung cấp</small>
+                        <p>{{ request_obj.supplier_name }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Số tiền</small>
+                        <p class="fw-bold" style="color: #0D6EFD; font-size: 1.5rem;">{{ format_currency(request_obj.amount) }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Ngày tạo</small>
+                        <p>{{ request_obj.created_at }}</p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Nội dung</small>
+                    <p class="p-2 bg-light rounded">{{ request_obj.content }}</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">Số hóa đơn</small>
+                        <p>{{ request_obj.invoice_number or 'N/A' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Ngày hóa đơn</small>
+                        <p>{{ request_obj.invoice_date or 'N/A' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-history"></i> Lịch sử phê duyệt
+            </div>
+            <div class="card-body">
+                {% if request_obj.approval_history %}
+                {% for history in request_obj.approval_history %}
+                <div class="border-start border-3 border-primary ps-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ history.role_name }} ({{ history.role }})</strong>
+                        <small class="text-muted">{{ history.timestamp }}</small>
+                    </div>
+                    <div>
+                        {% if history.action == 'approve' %}
+                        <span class="badge bg-success">Đã duyệt</span>
+                        {% elif history.action == 'reject' %}
+                        <span class="badge bg-danger">Từ chối</span>
+                        {% else %}
+                        <span class="badge bg-info">Yêu cầu thêm thông tin</span>
+                        {% endif %}
+                    </div>
+                    <p class="mb-0 mt-2"><em>"{{ history.note }}"</em></p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted text-center">Chưa có lịch sử phê duyệt</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-pen"></i> Thực hiện phê duyệt
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú <span class="text-danger">*</span></label>
+                        <textarea name="note" class="form-control" rows="3" required placeholder="Nhập ghi chú cho quyết định của bạn..."></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="action" value="approve" class="btn btn-success">
+                            <i class="fas fa-check"></i> Duyệt
+                        </button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Từ chối
+                        </button>
+                        <button type="submit" name="action" value="request_info" class="btn btn-warning">
+                            <i class="fas fa-question"></i> Yêu cầu thêm thông tin
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info"></i> Thông tin phê duyệt
+            </div>
+            <div class="card-body">
+                <p><strong>Cấp phê duyệt hiện tại:</strong></p>
+                <h4 class="text-primary">{{ get_status_label(request_obj.status) }}</h4>
+                <hr>
+                <p class="mb-1"><strong>Người phê duyệt:</strong></p>
+                <p>{{ user.name }} ({{ user.role }})</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

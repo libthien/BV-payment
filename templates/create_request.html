@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Tạo yêu cầu - VBQ Payment{% endblock %}
+
+{% block content %}
+{% set active_page = 'create' %}
+
+<div class="header">
+    <h2><i class="fas fa-plus-circle"></i> Tạo yêu cầu thanh toán</h2>
+    <p>Nhập thông tin yêu cầu thanh toán mới</p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nhà cung cấp <span class="text-danger">*</span></label>
+                    <select name="supplier" class="form-select" required>
+                        <option value="">-- Chọn nhà cung cấp --</option>
+                        {% for supplier in suppliers %}
+                        <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Số tiền (VNĐ) <span class="text-danger">*</span></label>
+                    <input type="number" name="amount" class="form-control" min="1" required placeholder="Nhập số tiền">
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Nội dung thanh toán <span class="text-danger">*</span></label>
+                <textarea name="content" class="form-control" rows="3" required placeholder="Mô tả nội dung thanh toán..."></textarea>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Số hóa đơn</label>
+                    <input type="text" name="invoice_number" class="form-control" placeholder="Số hóa đơn">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Ngày hóa đơn</label>
+                    <input type="date" name="invoice_date" class="form-control">
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">Đính kèm file</label>
+                <input type="file" name="attachment" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png">
+                <small class="text-muted">Chấp nhận: PDF, Word, Excel, Hình ảnh (tối đa 10MB)</small>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Gửi yêu cầu
+                </button>
+                <a href="{{ url_for('my_requests') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Hủy
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="fas fa-info-circle"></i> Lưu ý
+    </div>
+    <div class="card-body">
+        <ul>
+            <li>Yêu cầu sẽ được gửi đến Trưởng phòng (HOD) để phê duyệt cấp 1</li>
+            <li>Sau khi HOD duyệt, yêu cầu sẽ chuyển sang Finance để phê duyệt cấp 2</li>
+            <li>Tiếp theo sẽ qua CFO và Accounting để hoàn tất quy trình</li>
+            <li>Bạn có thể theo dõi trạng thái yêu cầu trong mục "Yêu cầu của tôi"</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

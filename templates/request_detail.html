@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Chi tiết yêu cầu - VBQ Payment{% endblock %}
+
+{% block content %}
+{% set active_page = 'my_requests' %}
+
+<div class="header">
+    <h2><i class="fas fa-file-invoice-dollar"></i> Chi tiết yêu cầu</h2>
+    <p>Mã yêu cầu: {{ request_obj.id }}</p>
+</div>
+
+<a href="{{ url_for('my_requests') }}" class="btn btn-secondary mb-3">
+    <i class="fas fa-arrow-left"></i> Quay lại
+</a>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Thông tin yêu cầu
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Mã yêu cầu</small>
+                        <p class="fw-bold">{{ request_obj.id }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Trạng thái</small>
+                        <p>
+                            <span class="badge badge-status badge-{{ 'approved' if request_obj.status == 'APPROVED' else ('rejected' if request_obj.status == 'REJECTED' else ('pending' if 'PENDING' in request_obj.status else 'info')) }}">
+                                {{ get_status_label(request_obj.status) }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Người yêu cầu</small>
+                        <p>{{ request_obj.creator_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Phòng ban</small>
+                        <p>{{ request_obj.department }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Nhà cung cấp</small>
+                        <p>{{ request_obj.supplier_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Số tiền</small>
+                        <p class="fw-bold" style="color: #0D6EFD; font-size: 1.2rem;">{{ format_currency(request_obj.amount) }}</p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Nội dung</small>
+                    <p>{{ request_obj.content }}</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">Số hóa đơn</small>
+                        <p>{{ request_obj.invoice_number or 'N/A' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Ngày hóa đơn</small>
+                        <p>{{ request_obj.invoice_date or 'N/A' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-history"></i> Lịch sử phê duyệt
+            </div>
+            <div class="card-body">
+                {% if request_obj.approval_history %}
+                <div class="timeline">
+                    {% for history in request_obj.approval_history %}
+                    <div class="border-start border-3 border-primary ps-3 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ history.role_name }} ({{ history.role }})</strong>
+                            <small class="text-muted">{{ history.timestamp }}</small>
+                        </div>
+                        <div>
+                            {% if history.action == 'approve' %}
+                            <span class="badge bg-success">Đã duyệt</span>
+                            {% elif history.action == 'reject' %}
+                            <span class="badge bg-danger">Từ chối</span>
+                            {% else %}
+                            <span class="badge bg-info">Yêu cầu thêm thông tin</span>
+                            {% endif %}
+                        </div>
+                        <p class="mb-0 mt-2"><em>"{{ history.note }}"</em></p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">Chưa có lịch sử phê duyệt</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-steps"></i> Quy trình phê duyệt
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="step-circle bg-{{ 'success' if request_obj.status != 'PENDING_HOD' and request_obj.status != 'INFO_REQUESTED' else ('warning' if request_obj.status == 'PENDING_HOD' else 'secondary') }} text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                        {% if request_obj.status != 'PENDING_HOD' and request_obj.status != 'INFO_REQUESTED' %}<i class="fas fa-check"></i>{% else %}1{% endif %}
+                    </div>
+                    <div class="ms-3">
+                        <strong>HOD</strong>
+                        <br><small class="text-muted">Trưởng phòng</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="step-circle bg-{{ 'success' if request_obj.status not in ['PENDING_HOD', 'PENDING_FINANCE'] and request_obj.status != 'INFO_REQUESTED' else ('warning' if request_obj.status == 'PENDING_FINANCE' else 'secondary') }} text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                        {% if request_obj.status not in ['PENDING_HOD', 'PENDING_FINANCE'] and request_obj.status != 'INFO_REQUESTED' %}<i class="fas fa-check"></i>{% else %}2{% endif %}
+                    </div>
+                    <div class="ms-3">
+                        <strong>FINANCE</strong>
+                        <br><small class="text-muted">Tài chính</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="step-circle bg-{{ 'success' if request_obj.status not in ['PENDING_HOD', 'PENDING_FINANCE', 'PENDING_CFO'] and request_obj.status != 'INFO_REQUESTED' else ('warning' if request_obj.status == 'PENDING_CFO' else 'secondary') }} text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                        {% if request_obj.status not in ['PENDING_HOD', 'PENDING_FINANCE', 'PENDING_CFO'] and request_obj.status != 'INFO_REQUESTED' %}<i class="fas fa-check"></i>{% else %}3{% endif %}
+                    </div>
+                    <div class="ms-3">
+                        <strong>CFO</strong>
+                        <br><small class="text-muted">Giám đốc tài chính</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="step-circle bg-{{ 'success' if request_obj.status == 'APPROVED' else ('warning' if request_obj.status == 'PENDING_ACCOUNTING' else 'secondary') }} text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                        {% if request_obj.status == 'APPROVED' %}<i class="fas fa-check"></i>{% else %}4{% endif %}
+                    </div>
+                    <div class="ms-3">
+                        <strong>ACCOUNTING</strong>
+                        <br><small class="text-muted">Kế toán</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

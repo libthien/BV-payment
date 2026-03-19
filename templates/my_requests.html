@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Yêu cầu của tôi - VBQ Payment{% endblock %}
+
+{% block content %}
+{% set active_page = 'my_requests' %}
+
+<div class="header">
+    <h2><i class="fas fa-list"></i> Yêu cầu của tôi</h2>
+    <p>Danh sách các yêu cầu thanh toán bạn đã tạo</p>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="{{ url_for('create_request') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Tạo yêu cầu mới
+    </a>
+    <span class="text-muted">Tổng: {{ requests | length }} yêu cầu</span>
+</div>
+
+{% if requests %}
+{% for req in requests %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5 class="mb-1"><strong>{{ req.id }}</strong></h5>
+                <p class="mb-1 text-muted">{{ req.creator_name }} - {{ req.department }}</p>
+            </div>
+            <span class="badge badge-status badge-{{ 'approved' if req.status == 'APPROVED' else ('rejected' if req.status == 'REJECTED' else ('pending' if 'PENDING' in req.status else 'info')) }}">
+                {{ get_status_label(req.status) }}
+            </span>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-3">
+                <small class="text-muted">Nhà cung cấp</small>
+                <p class="mb-0">{{ req.supplier_name }}</p>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">Số tiền</small>
+                <p class="mb-0 fw-bold" style="color: #0D6EFD;">{{ format_currency(req.amount) }}</p>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">Ngày tạo</small>
+                <p class="mb-0">{{ req.created_at }}</p>
+            </div>
+            <div class="col-md-3 text-end">
+                <a href="{{ url_for('request_detail', req_id=req.id) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i> Xem chi tiết
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+        <h5>Chưa có yêu cầu nào</h5>
+        <p class="text-muted">Bạn chưa tạo bất kỳ yêu cầu thanh toán nào</p>
+        <a href="{{ url_for('create_request') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tạo yêu cầu đầu tiên
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

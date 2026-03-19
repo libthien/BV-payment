@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VBQ Payment{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-blue: #0D6EFD;
+            --light-blue: #0DCAF0;
+            --dark-blue: #0A58CA;
+            --pale-blue: #E7F1FF;
+            --bg-color: #F8F9FA;
+            --text-dark: #2D3436;
+            --text-muted: #636E72;
+        }
+        
+        * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background: var(--bg-color); color: var(--text-dark); }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #E7F1FF 0%, #D0E3FF 100%);
+            border-right: 2px solid #BADBFF;
+            padding: 20px 0;
+        }
+        
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            padding: 15px 20px;
+            border-bottom: 2px solid #BADBFF;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-brand i { color: var(--primary-blue); margin-right: 10px; }
+        
+        .nav-item {
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            color: var(--text-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .nav-item i { width: 25px; margin-right: 10px; }
+        
+        .main-content {
+            padding: 30px;
+            background: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0DCAF0 0%, #0D6EFD 100%);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.1);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(13, 110, 253, 0.2); }
+        
+        .card-header {
+            background: var(--pale-blue);
+            border-bottom: 2px solid #BADBFF;
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            border-radius: 15px 15px 0 0 !important;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--pale-blue) 0%, white 100%);
+            border-left: 4px solid var(--primary-blue);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .stat-card .icon {
+            font-size: 2rem;
+            color: var(--primary-blue);
+        }
+        
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+        
+        .stat-card .label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .btn-primary:hover {
+            background: var(--dark-blue);
+            border-color: var(--dark-blue);
+        }
+        
+        .btn-success { background: #00B894; border-color: #00B894; }
+        .btn-danger { background: #E74C3C; border-color: #E74C3C; }
+        .btn-warning { background: #FDCB6E; border-color: #FDCB6E; }
+        
+        .badge-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .badge-pending { background: #FFF3CD; color: #856404; }
+        .badge-approved { background: #D4EDDA; color: #155724; }
+        .badge-rejected { background: #F8D7DA; color: #721C24; }
+        .badge-info { background: #D1ECF1; color: #0C5460; }
+        
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table thead {
+            background: var(--pale-blue);
+            color: var(--dark-blue);
+        }
+        
+        .table-hover tbody tr:hover {
+            background: var(--pale-blue);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .alert-success { background: #D4EDDA; border-color: #C3E6CB; color: #155724; }
+        .alert-danger { background: #F8D7DA; border-color: #F5C6CB; color: #721C24; }
+        .alert-warning { background: #FFF3CD; border-color: #FFEBA0; color: #856404; }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { padding: 15px; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if session.user %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 sidebar">
+                <div class="sidebar-brand">
+                    <i class="fas fa-credit-card"></i> VBQ PAYMENT
+                </div>
+                <div style="padding: 0 20px; margin-bottom: 20px;">
+                    <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                        <i class="fas fa-user-circle fa-3x" style="color: var(--primary-blue);"></i>
+                        <div style="font-weight: 600; margin-top: 10px;">{{ user.name }}</div>
+                        <small style="color: var(--text-muted);">{{ user.role }}</small>
+                        <div><small style="color: var(--text-muted);">{{ user.department }}</small></div>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('dashboard') }}" class="nav-item {{ 'active' if active_page == 'dashboard' else '' }}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="{{ url_for('create_request') }}" class="nav-item {{ 'active' if active_page == 'create' else '' }}">
+                    <i class="fas fa-plus-circle"></i> Tạo yêu cầu
+                </a>
+                <a href="{{ url_for('my_requests') }}" class="nav-item {{ 'active' if active_page == 'my_requests' else '' }}">
+                    <i class="fas fa-list"></i> Yêu cầu của tôi
+                </a>
+                {% if user.role in ['HOD', 'FINANCE', 'CFO', 'ACCOUNTING', 'ADMIN'] %}
+                <a href="{{ url_for('approval_list') }}" class="nav-item {{ 'active' if active_page == 'approval' else '' }}">
+                    <i class="fas fa-check-circle"></i> Phê duyệt
+                </a>
+                {% endif %}
+
+                <a href="{{ url_for('logout') }}" class="nav-item" style="margin-top: 30px;">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+            </div>
+            
+            <div class="col-md-10 main-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    {% block login_content %}{% endblock %}
+    {% endif %}
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
