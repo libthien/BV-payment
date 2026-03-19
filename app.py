@@ -14,14 +14,43 @@ app.secret_key = 'vbq-payment-secret-key-2024'
 
 DEMO_MODE = True
 
+departments = [
+    "Khoa Nội tổng hợp",
+    "Khoa Ngoại tổng hợp",
+    "Khoa Sản phụ khoa",
+    "Khoa Nhi",
+    "Khoa Cấp cứu",
+    "Khoa Xét nghiệm",
+    "Khoa Chẩn đoán hình ảnh",
+    "Khoa Dược",
+    "Khoa Hồi sức",
+    "Khoa Vật lý trị liệu"
+]
+
 demo_users = {
     "user1@vbq.com": {"id": "user1", "email": "user1@vbq.com", "name": "Nguyễn Văn A", "role": "USER", "department": "Khoa Nội tổng hợp", "password": "123456"},
     "user2@vbq.com": {"id": "user2", "email": "user2@vbq.com", "name": "Trần Thị B", "role": "USER", "department": "Khoa Ngoại tổng hợp", "password": "123456"},
     "user3@vbq.com": {"id": "user3", "email": "user3@vbq.com", "name": "Lê Văn C", "role": "USER", "department": "Khoa Sản phụ khoa", "password": "123456"},
-    "hod@vbq.com": {"id": "hod1", "email": "hod@vbq.com", "name": "Phạm Văn D", "role": "HOD", "department": "Khoa Nội tổng hợp", "password": "123456"},
-    "finance@vbq.com": {"id": "fin1", "email": "finance@vbq.com", "name": "Nguyễn Thị E", "role": "FINANCE", "department": "Tài chính - Kế toán", "password": "123456"},
-    "cfo@vbq.com": {"id": "cfo1", "email": "cfo@vbq.com", "name": "Trần Văn F", "role": "CFO", "department": "Tài chính - Kế toán", "password": "123456"},
-    "accounting@vbq.com": {"id": "acc1", "email": "accounting@vbq.com", "name": "Lê Thị G", "role": "ACCOUNTING", "department": "Tài chính - Kế toán", "password": "123456"},
+    "user4@vbq.com": {"id": "user4", "email": "user4@vbq.com", "name": "Phạm Thị D", "role": "USER", "department": "Khoa Nhi", "password": "123456"},
+    "user5@vbq.com": {"id": "user5", "email": "user5@vbq.com", "name": "Nguyễn Văn E", "role": "USER", "department": "Khoa Cấp cứu", "password": "123456"},
+    "user6@vbq.com": {"id": "user6", "email": "user6@vbq.com", "name": "Trần Văn F", "role": "USER", "department": "Khoa Xét nghiệm", "password": "123456"},
+    "user7@vbq.com": {"id": "user7", "email": "user7@vbq.com", "name": "Lê Thị G", "role": "USER", "department": "Khoa Chẩn đoán hình ảnh", "password": "123456"},
+    "user8@vbq.com": {"id": "user8", "email": "user8@vbq.com", "name": "Vũ Văn H", "role": "USER", "department": "Khoa Dược", "password": "123456"},
+    "user9@vbq.com": {"id": "user9", "email": "user9@vbq.com", "name": "Nguyễn Thị I", "role": "USER", "department": "Khoa Hồi sức", "password": "123456"},
+    "user10@vbq.com": {"id": "user10", "email": "user10@vbq.com", "name": "Trần Văn K", "role": "USER", "department": "Khoa Vật lý trị liệu", "password": "123456"},
+    "hod1@vbq.com": {"id": "hod1", "email": "hod1@vbq.com", "name": "Phạm Văn D", "role": "HOD", "department": "Khoa Nội tổng hợp", "password": "123456"},
+    "hod2@vbq.com": {"id": "hod2", "email": "hod2@vbq.com", "name": "Hoàng Thị E", "role": "HOD", "department": "Khoa Ngoại tổng hợp", "password": "123456"},
+    "hod3@vbq.com": {"id": "hod3", "email": "hod3@vbq.com", "name": "Nguyễn Văn F", "role": "HOD", "department": "Khoa Sản phụ khoa", "password": "123456"},
+    "hod4@vbq.com": {"id": "hod4", "email": "hod4@vbq.com", "name": "Trần Thị G", "role": "HOD", "department": "Khoa Nhi", "password": "123456"},
+    "hod5@vbq.com": {"id": "hod5", "email": "hod5@vbq.com", "name": "Lê Văn H", "role": "HOD", "department": "Khoa Cấp cứu", "password": "123456"},
+    "hod6@vbq.com": {"id": "hod6", "email": "hod6@vbq.com", "name": "Phạm Văn I", "role": "HOD", "department": "Khoa Xét nghiệm", "password": "123456"},
+    "hod7@vbq.com": {"id": "hod7", "email": "hod7@vbq.com", "name": "Vũ Thị K", "role": "HOD", "department": "Khoa Chẩn đoán hình ảnh", "password": "123456"},
+    "hod8@vbq.com": {"id": "hod8", "email": "hod8@vbq.com", "name": "Nguyễn Văn L", "role": "HOD", "department": "Khoa Dược", "password": "123456"},
+    "hod9@vbq.com": {"id": "hod9", "email": "hod9@vbq.com", "name": "Trần Văn M", "role": "HOD", "department": "Khoa Hồi sức", "password": "123456"},
+    "hod10@vbq.com": {"id": "hod10", "email": "hod10@vbq.com", "name": "Lê Văn N", "role": "HOD", "department": "Khoa Vật lý trị liệu", "password": "123456"},
+    "finance@vbq.com": {"id": "fin1", "email": "finance@vbq.com", "name": "Nguyễn Thị P", "role": "FINANCE", "department": "Tài chính - Kế toán", "password": "123456"},
+    "cfo@vbq.com": {"id": "cfo1", "email": "cfo@vbq.com", "name": "Trần Văn Q", "role": "CFO", "department": "Tài chính - Kế toán", "password": "123456"},
+    "accounting@vbq.com": {"id": "acc1", "email": "accounting@vbq.com", "name": "Lê Thị R", "role": "ACCOUNTING", "department": "Tài chính - Kế toán", "password": "123456"},
     "admin@vbq.com": {"id": "admin1", "email": "admin@vbq.com", "name": "Admin System", "role": "ADMIN", "department": "Hành chính", "password": "123456"},
 }
 
@@ -41,6 +70,9 @@ demo_budgets = {
     "Khoa Cấp cứu": {"budget": 700000000, "used": 380000000},
     "Khoa Xét nghiệm": {"budget": 400000000, "used": 150000000},
     "Khoa Chẩn đoán hình ảnh": {"budget": 550000000, "used": 220000000},
+    "Khoa Dược": {"budget": 450000000, "used": 180000000},
+    "Khoa Hồi sức": {"budget": 600000000, "used": 250000000},
+    "Khoa Vật lý trị liệu": {"budget": 350000000, "used": 120000000},
     "Tài chính - Kế toán": {"budget": 300000000, "used": 100000000},
 }
 
@@ -269,6 +301,49 @@ def get_next_stage(current_stage):
         pass
     return current_stage
 
+def check_budget_available(department, amount):
+    dept_budget = demo_budgets.get(department, {})
+    budget = dept_budget.get('budget', 0)
+    used = dept_budget.get('used', 0)
+    remaining = budget - used
+    return remaining >= amount, remaining, budget, used
+
+def process_auto_approval(request_obj):
+    department = request_obj['department']
+    amount = request_obj['amount']
+    
+    is_within_budget, remaining, total_budget, used = check_budget_available(department, amount)
+    
+    current_status = request_obj['status']
+    auto_approved_stages = []
+    
+    # Define which roles can auto-approve which stages
+    stage_to_role = {
+        'PENDING_FINANCE': 'FINANCE',
+        'PENDING_CFO': 'CFO'
+    }
+    
+    if current_status in stage_to_role and is_within_budget:
+        role = stage_to_role[current_status]
+        # Check if we already have an auto-approval entry for this role and status to avoid duplicates
+        existing_auto = any(
+            h.get('role') == role and h.get('action') == 'auto_approve' and h.get('is_auto') is True
+            for h in request_obj.get('approval_history', [])
+        )
+        if not existing_auto:
+            request_obj['approval_history'].append({
+                'role': role,
+                'role_name': 'Hệ thống (Auto)',
+                'action': 'auto_approve',
+                'note': f'Tự động duyệt - Trong ngân sách (còn {format_currency(remaining)})',
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'is_auto': True
+            })
+            request_obj['status'] = get_next_stage(current_status)
+            auto_approved_stages.append(role)
+    
+    return auto_approved_stages, is_within_budget, remaining, total_budget, used
+
 def can_user_approve(user_role, request_status):
     if user_role == "ADMIN":
         return True
@@ -462,7 +537,14 @@ def request_detail(req_id):
         flash('Yêu cầu không tồn tại!', 'error')
         return redirect(url_for('my_requests'))
     
-    return render_template('request_detail.html', user=user, request_obj=request_obj, format_currency=format_currency, get_status_label=get_status_label, get_status_class=get_status_class)
+    # Users can only view requests from their own department
+    if user['role'] in ['USER', 'HOD'] and request_obj['department'] != user['department']:
+        flash('Bạn không có quyền xem yêu cầu này!', 'error')
+        return redirect(url_for('my_requests'))
+    
+    budget_info = check_budget_available(request_obj['department'], request_obj['amount'])
+    
+    return render_template('request_detail.html', user=user, request_obj=request_obj, format_currency=format_currency, get_status_label=get_status_label, get_status_class=get_status_class, budget_info=budget_info)
 
 @app.route('/approval')
 @login_required
@@ -485,6 +567,11 @@ def approval_list():
             pending = [r for r in demo_requests if r['status'] == required_stage and r['department'] == user['department']]
         else:
             pending = [r for r in demo_requests if r['status'] == required_stage]
+        
+        # Process auto-approval for Finance and CFO roles
+        if user['role'] in ['FINANCE', 'CFO']:
+            for request_obj in pending:
+                process_auto_approval(request_obj)
     
     pending = sorted(pending, key=lambda x: x.get('created_at', ''), reverse=True)
     return render_template('approval_list.html', user=user, requests=pending, format_currency=format_currency, get_status_label=get_status_label, get_status_class=get_status_class)
@@ -500,9 +587,16 @@ def approval_detail(req_id):
         flash('Yêu cầu không tồn tại!', 'error')
         return redirect(url_for('approval_list'))
     
+    # HOD can only view requests from their own department
+    if user['role'] == 'HOD' and request_obj['department'] != user['department']:
+        flash('Bạn không có quyền phê duyệt yêu cầu này!', 'error')
+        return redirect(url_for('approval_list'))
+    
     if not can_user_approve(user['role'], request_obj['status']):
         flash('Bạn không có quyền phê duyệt yêu cầu này!', 'error')
         return redirect(url_for('approval_list'))
+    
+    budget_info = check_budget_available(request_obj['department'], request_obj['amount'])
     
     if request.method == 'POST':
         action = request.form.get('action')
@@ -510,31 +604,66 @@ def approval_detail(req_id):
         
         if not note:
             flash('Vui lòng nhập ghi chú!', 'error')
-            return render_template('approval_detail.html', user=user, request_obj=request_obj, format_currency=format_currency, get_status_label=get_status_label, get_status_class=get_status_class)
-        
-        approval_record = {
-            'role': user['role'],
-            'role_name': user['name'],
-            'action': action,
-            'note': note,
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        request_obj['approval_history'].append(approval_record)
+            return render_template('approval_detail.html', user=user, request_obj=request_obj, format_currency=format_currency, get_status_label=get_status_label, get_status_class=get_status_class, budget_info=budget_info)
         
         if action == 'approve':
-            request_obj['status'] = get_next_stage(request_obj['status'])
-            flash('Phê duyệt thành công!', 'success')
+            next_stage = get_next_stage(request_obj['status'])
+            request_obj['status'] = next_stage
+            
+            if next_stage == 'PENDING_FINANCE':
+                # Update budget when moving to FINANCE stage (HOD approval)
+                demo_budgets[request_obj['department']]['used'] += request_obj['amount']
+            
+            # Add approval record
+            approval_record = {
+                'role': user['role'],
+                'role_name': user['name'],
+                'action': action,
+                'note': note,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            request_obj['approval_history'].append(approval_record)
+            
+            # Process auto-approval for Finance and CFO stages
+            auto_stages, is_within_budget, remaining, total_budget, used = process_auto_approval(request_obj)
+            
+            if auto_stages:
+                stage_names = ' và '.join(auto_stages)
+                flash(f'Phê duyệt thành công! {stage_names} đã được tự động duyệt do còn trong ngân sách.', 'success')
+            else:
+                flash('Phê duyệt thành công!', 'success')
         elif action == 'reject':
             request_obj['status'] = 'REJECTED'
+            
+            # Add approval record
+            approval_record = {
+                'role': user['role'],
+                'role_name': user['name'],
+                'action': action,
+                'note': note,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            request_obj['approval_history'].append(approval_record)
+            
             flash('Đã từ chối yêu cầu!', 'success')
         elif action == 'request_info':
             request_obj['status'] = 'INFO_REQUESTED'
+            
+            # Add approval record
+            approval_record = {
+                'role': user['role'],
+                'role_name': user['name'],
+                'action': action,
+                'note': note,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            request_obj['approval_history'].append(approval_record)
+            
             flash('Đã gửi yêu cầu bổ sung thông tin!', 'success')
         
         return redirect(url_for('approval_list'))
     
-    return render_template('approval_detail.html', user=user, request_obj=request_obj, format_currency=format_currency, get_status_label=get_status_label, get_status_class=get_status_class)
+    return render_template('approval_detail.html', user=user, request_obj=request_obj, format_currency=format_currency, get_status_label=get_status_label, get_status_class=get_status_class, budget_info=budget_info)
 
 @app.route('/reports')
 @login_required
@@ -564,6 +693,42 @@ def reports():
                          dept_amounts=dept_amounts,
                          format_currency=format_currency,
                          get_status_label=get_status_label)
+
+@app.route('/approval/history')
+@login_required
+@role_required(['HOD', 'FINANCE', 'CFO', 'ACCOUNTING', 'ADMIN'])
+def approval_history():
+    user = session['user']
+    
+    if user['role'] == 'ADMIN':
+        all_approved = [r for r in demo_requests if r['status'] in ['APPROVED', 'REJECTED', 'PENDING_FINANCE', 'PENDING_CFO', 'PENDING_ACCOUNTING']]
+    elif user['role'] == 'HOD':
+        approved_by_hod = [r for r in demo_requests if r['department'] == user['department'] and any(h['role'] == 'HOD' and h['action'] == 'approve' for h in r.get('approval_history', []))]
+        pending_hod = [r for r in demo_requests if r['department'] == user['department'] and r['status'] == 'PENDING_HOD']
+        all_approved = approved_by_hod + pending_hod
+    elif user['role'] == 'FINANCE':
+        approved_by_finance = [r for r in demo_requests if any(h['role'] == 'FINANCE' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', []))]
+        pending_finance = [r for r in demo_requests if r['status'] == 'PENDING_FINANCE']
+        all_approved = approved_by_finance + pending_finance
+    elif user['role'] == 'CFO':
+        approved_by_cfo = [r for r in demo_requests if any(h['role'] == 'CFO' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', []))]
+        pending_cfo = [r for r in demo_requests if r['status'] == 'PENDING_CFO']
+        all_approved = approved_by_cfo + pending_cfo
+    elif user['role'] == 'ACCOUNTING':
+        approved_by_acc = [r for r in demo_requests if any(h['role'] == 'ACCOUNTING' and h['action'] == 'approve' for h in r.get('approval_history', []))]
+        pending_acc = [r for r in demo_requests if r['status'] == 'PENDING_ACCOUNTING']
+        all_approved = approved_by_acc + pending_acc
+    else:
+        all_approved = []
+    
+    all_approved = sorted(all_approved, key=lambda x: x.get('created_at', ''), reverse=True)
+    
+    return render_template('approval_history.html', 
+                         user=user, 
+                         requests=all_approved, 
+                         format_currency=format_currency, 
+                         get_status_label=get_status_label, 
+                         get_status_class=get_status_class)
 
 @app.route('/api/stats')
 @login_required

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Lịch sử phê duyệt - VBQ Payment{% endblock %}
+
+{% block content %}
+{% set active_page = 'approval_history' %}
+
+<div class="header">
+    <h2><i class="fas fa-history"></i> Lịch sử phê duyệt</h2>
+    <p>Danh sách yêu cầu đã phê duyệt và trạng thái hiện tại</p>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <span class="text-muted">Tổng: {{ requests | length }} yêu cầu</span>
+</div>
+
+{% if requests %}
+{% for req in requests %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5 class="mb-1"><strong>{{ req.id }}</strong></h5>
+                <p class="mb-1 text-muted">{{ req.creator_name }} - {{ req.department }}</p>
+            </div>
+            <span class="badge badge-status badge-{{ get_status_class(req.status) }}">{{ get_status_label(req.status) }}</span>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-3">
+                <small class="text-muted">Nhà cung cấp</small>
+                <p class="mb-0">{{ req.supplier_name }}</p>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">Số tiền</small>
+                <p class="mb-0 fw-bold" style="color: #0D6EFD;">{{ format_currency(req.amount) }}</p>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">Ngày tạo</small>
+                <p class="mb-0">{{ req.created_at }}</p>
+            </div>
+            <div class="col-md-3 text-end">
+                <a href="{{ url_for('request_detail', req_id=req.id) }}" class="btn btn-info">
+                    <i class="fas fa-eye"></i> Xem chi tiết
+                </a>
+            </div>
+        </div>
+        {% if req.approval_history %}
+        <hr>
+        <small class="text-muted">Lịch sử phê duyệt:</small>
+        <div class="mt-2">
+            {% for approval in req.approval_history %}
+            <div class="d-flex align-items-center mb-1">
+                <span class="badge badge-{{ 'success' if approval.action == 'approve' else 'danger' }} me-2">
+                    {{ approval.role }}
+                </span>
+                <span class="me-2">{{ approval.role_name }}:</span>
+                <span class="text-muted">{{ approval.note }}</span>
+                <span class="ms-auto text-muted small">{{ approval.timestamp }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-history fa-4x text-muted mb-3"></i>
+        <h5>Chưa có lịch sử phê duyệt</h5>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

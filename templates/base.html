@@ -199,6 +199,9 @@
                 <a href="{{ url_for('approval_list') }}" class="nav-item {{ 'active' if active_page == 'approval' else '' }}">
                     <i class="fas fa-check-circle"></i> Phê duyệt
                 </a>
+                <a href="{{ url_for('approval_history') }}" class="nav-item {{ 'active' if active_page == 'approval_history' else '' }}">
+                    <i class="fas fa-history"></i> Lịch sử duyệt
+                </a>
                 {% endif %}
 
                 <a href="{{ url_for('logout') }}" class="nav-item" style="margin-top: 30px;">
