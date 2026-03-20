@@ -505,7 +505,7 @@ def create_request():
         
         if not is_within_budget:
             flash(f'Yêu cầu vượt quá ngân sách phòng ban! Ngân sách còn còn: {format_currency(remaining_budget)}. Vui lòng giảm số tiền yêu cầu.', 'error')
-            return render_template('create_request.html', user=user, suppliers=demo_suppliers, remaining_budget=remaining_budget, total_budget=total_budget, used_budget=used_budget)
+            return render_template('create_request.html', user=user, suppliers=demo_suppliers, remaining_budget=remaining_budget, total_budget=total_budget, used_budget=used_budget, format_currency=format_currency)
         
         new_request = {
             'id': generate_request_id(),
@@ -527,7 +527,7 @@ def create_request():
         flash('Yêu cầu thanh toán đã được tạo thành công!', 'success')
         return redirect(url_for('my_requests'))
     
-    return render_template('create_request.html', user=user, suppliers=demo_suppliers, remaining_budget=remaining_budget, total_budget=total_budget, used_budget=used_budget)
+    return render_template('create_request.html', user=user, suppliers=demo_suppliers, remaining_budget=remaining_budget, total_budget=total_budget, used_budget=used_budget, format_currency=format_currency)
 
 @app.route('/requests/my')
 @login_required
