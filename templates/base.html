@@ -192,9 +192,11 @@
                 <a href="{{ url_for('create_request') }}" class="nav-item {{ 'active' if active_page == 'create' else '' }}">
                     <i class="fas fa-plus-circle"></i> Tạo yêu cầu
                 </a>
+                {% if user.role != 'ACCOUNTING' %}
                 <a href="{{ url_for('my_requests') }}" class="nav-item {{ 'active' if active_page == 'my_requests' else '' }}">
                     <i class="fas fa-list"></i> Yêu cầu của tôi
                 </a>
+                {% endif %}
                 {% if user.role in ['HOD', 'FINANCE', 'CFO', 'ACCOUNTING', 'ADMIN'] %}
                 <a href="{{ url_for('approval_list') }}" class="nav-item {{ 'active' if active_page == 'approval' else '' }}">
                     <i class="fas fa-check-circle"></i> Phê duyệt

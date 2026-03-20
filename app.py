@@ -497,6 +497,21 @@ def create_request():
         
         supplier = next((s for s in demo_suppliers if s['id'] == supplier_id), None)
         
+        # Check if department has any approved special requests that would lock it
+        dept_has_approved_special = any(
+            req.get('department') == user['department'] and 
+            req.get('is_special_request', False) and 
+            req.get('status') == 'APPROVED'
+            for req in demo_requests
+        )
+        
+        if dept_has_approved_special:
+            flash('Phòng ban của bạn đã có yêu cầu đặc biệt được duyệt và hiện không thể tạo yêu cầu mới!', 'error')
+            return redirect(url_for('my_requests'))
+        
+        # Check if request exceeds department budget
+        is_within_budget, remaining, total_budget, used = check_budget_available(user['department'], amount)
+        
         new_request = {
             'id': generate_request_id(),
             'created_by': user['email'],
@@ -510,8 +525,13 @@ def create_request():
             'invoice_date': invoice_date,
             'status': 'PENDING_HOD',
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'approval_history': []
+            'approval_history': [],
+            'is_special_request': not is_within_budget,  # Mark if exceeds budget
+            'original_amount': amount  # Keep original amount for reference
         }
+        
+        # If request exceeds budget, we keep the original amount for display and processing
+        # but mark it as special so it gets handled appropriately in the approval process
         
         demo_requests.append(new_request)
         flash('Yêu cầu thanh toán đã được tạo thành công!', 'success')
@@ -608,11 +628,20 @@ def approval_detail(req_id):
         
         if action == 'approve':
             next_stage = get_next_stage(request_obj['status'])
+            
+            # Always proceed to next stage for HOD approval (special requests go to finance for review)
             request_obj['status'] = next_stage
             
             if next_stage == 'PENDING_FINANCE':
                 # Update budget when moving to FINANCE stage (HOD approval)
-                demo_budgets[request_obj['department']]['used'] += request_obj['amount']
+                # For special requests (exceeding budget), set used to budget (making remaining 0)
+                # For normal requests, add the amount as usual
+                if request_obj.get('is_special_request', False):
+                    # Special request: set used to budget amount (remaining becomes 0)
+                    demo_budgets[request_obj['department']]['used'] = demo_budgets[request_obj['department']]['budget']
+                else:
+                    # Normal request: add the amount to used
+                    demo_budgets[request_obj['department']]['used'] += request_obj['amount']
             
             # Add approval record
             approval_record = {
@@ -707,15 +736,15 @@ def approval_history():
         pending_hod = [r for r in demo_requests if r['department'] == user['department'] and r['status'] == 'PENDING_HOD']
         all_approved = approved_by_hod + pending_hod
     elif user['role'] == 'FINANCE':
-        approved_by_finance = [r for r in demo_requests if any(h['role'] == 'FINANCE' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', []))]
+        approved_by_finance = [r for r in demo_requests if any(h['role'] == 'FINANCE' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', [])) or r.get('is_special_request', False)]
         pending_finance = [r for r in demo_requests if r['status'] == 'PENDING_FINANCE']
         all_approved = approved_by_finance + pending_finance
     elif user['role'] == 'CFO':
-        approved_by_cfo = [r for r in demo_requests if any(h['role'] == 'CFO' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', []))]
+        approved_by_cfo = [r for r in demo_requests if any(h['role'] == 'CFO' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', [])) or r.get('is_special_request', False)]
         pending_cfo = [r for r in demo_requests if r['status'] == 'PENDING_CFO']
         all_approved = approved_by_cfo + pending_cfo
     elif user['role'] == 'ACCOUNTING':
-        approved_by_acc = [r for r in demo_requests if any(h['role'] == 'ACCOUNTING' and h['action'] == 'approve' for h in r.get('approval_history', []))]
+        approved_by_acc = [r for r in demo_requests if any(h['role'] == 'ACCOUNTING' and h['action'] == 'approve' for h in r.get('approval_history', [])) or r.get('is_special_request', False)]
         pending_acc = [r for r in demo_requests if r['status'] == 'PENDING_ACCOUNTING']
         all_approved = approved_by_acc + pending_acc
     else:
@@ -733,11 +762,13 @@ def approval_history():
 @app.route('/api/stats')
 @login_required
 def api_stats():
+    special_requests = len([r for r in demo_requests if r.get('is_special_request', False)])
     return jsonify({
         'total': len(demo_requests),
         'pending': len([r for r in demo_requests if r['status'] not in ['APPROVED', 'REJECTED']]),
         'approved': len([r for r in demo_requests if r['status'] == 'APPROVED']),
         'rejected': len([r for r in demo_requests if r['status'] == 'REJECTED']),
+        'special': special_requests,
         'total_amount': sum(r['amount'] for r in demo_requests)
     })
 
