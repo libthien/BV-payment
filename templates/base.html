@@ -189,10 +189,10 @@
                 <a href="{{ url_for('dashboard') }}" class="nav-item {{ 'active' if active_page == 'dashboard' else '' }}">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
+                {% if user.role != 'ACCOUNTING' %}
                 <a href="{{ url_for('create_request') }}" class="nav-item {{ 'active' if active_page == 'create' else '' }}">
                     <i class="fas fa-plus-circle"></i> Tạo yêu cầu
                 </a>
-                {% if user.role != 'ACCOUNTING' %}
                 <a href="{{ url_for('my_requests') }}" class="nav-item {{ 'active' if active_page == 'my_requests' else '' }}">
                     <i class="fas fa-list"></i> Yêu cầu của tôi
                 </a>

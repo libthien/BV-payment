@@ -726,15 +726,15 @@ def approval_history():
         pending_hod = [r for r in demo_requests if r['department'] == user['department'] and r['status'] == 'PENDING_HOD']
         all_approved = approved_by_hod + pending_hod
     elif user['role'] == 'FINANCE':
-        approved_by_finance = [r for r in demo_requests if any(h['role'] == 'FINANCE' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', [])) or r.get('is_special_request', False)]
+        approved_by_finance = [r for r in demo_requests if any(h['role'] == 'FINANCE' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', []))]
         pending_finance = [r for r in demo_requests if r['status'] == 'PENDING_FINANCE']
         all_approved = approved_by_finance + pending_finance
     elif user['role'] == 'CFO':
-        approved_by_cfo = [r for r in demo_requests if any(h['role'] == 'CFO' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', [])) or r.get('is_special_request', False)]
+        approved_by_cfo = [r for r in demo_requests if any(h['role'] == 'CFO' and h['action'] in ['approve', 'auto_approve'] for h in r.get('approval_history', []))]
         pending_cfo = [r for r in demo_requests if r['status'] == 'PENDING_CFO']
         all_approved = approved_by_cfo + pending_cfo
     elif user['role'] == 'ACCOUNTING':
-        approved_by_acc = [r for r in demo_requests if any(h['role'] == 'ACCOUNTING' and h['action'] == 'approve' for h in r.get('approval_history', [])) or r.get('is_special_request', False)]
+        approved_by_acc = [r for r in demo_requests if any(h['role'] == 'ACCOUNTING' and h['action'] == 'approve' for h in r.get('approval_history', []))]
         pending_acc = [r for r in demo_requests if r['status'] == 'PENDING_ACCOUNTING']
         all_approved = approved_by_acc + pending_acc
     else:
