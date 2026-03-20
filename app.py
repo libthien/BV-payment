@@ -488,6 +488,9 @@ def dashboard():
 def create_request():
     user = session['user']
     
+    # Get budget info for display in form
+    is_within_budget_check, remaining_budget, total_budget, used_budget = check_budget_available(user['department'], 0)
+    
     if request.method == 'POST':
         supplier_id = request.form.get('supplier')
         amount = float(request.form.get('amount', 0))
@@ -497,20 +500,12 @@ def create_request():
         
         supplier = next((s for s in demo_suppliers if s['id'] == supplier_id), None)
         
-        # Check if department has any approved special requests that would lock it
-        dept_has_approved_special = any(
-            req.get('department') == user['department'] and 
-            req.get('is_special_request', False) and 
-            req.get('status') == 'APPROVED'
-            for req in demo_requests
-        )
-        
-        if dept_has_approved_special:
-            flash('Phòng ban của bạn đã có yêu cầu đặc biệt được duyệt và hiện không thể tạo yêu cầu mới!', 'error')
-            return redirect(url_for('my_requests'))
-        
         # Check if request exceeds department budget
         is_within_budget, remaining, total_budget, used = check_budget_available(user['department'], amount)
+        
+        if not is_within_budget:
+            flash(f'Yêu cầu vượt quá ngân sách phòng ban! Ngân sách còn còn: {format_currency(remaining_budget)}. Vui lòng giảm số tiền yêu cầu.', 'error')
+            return render_template('create_request.html', user=user, suppliers=demo_suppliers, remaining_budget=remaining_budget)
         
         new_request = {
             'id': generate_request_id(),
@@ -525,19 +520,14 @@ def create_request():
             'invoice_date': invoice_date,
             'status': 'PENDING_HOD',
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'approval_history': [],
-            'is_special_request': not is_within_budget,  # Mark if exceeds budget
-            'original_amount': amount  # Keep original amount for reference
+            'approval_history': []
         }
-        
-        # If request exceeds budget, we keep the original amount for display and processing
-        # but mark it as special so it gets handled appropriately in the approval process
         
         demo_requests.append(new_request)
         flash('Yêu cầu thanh toán đã được tạo thành công!', 'success')
         return redirect(url_for('my_requests'))
     
-    return render_template('create_request.html', user=user, suppliers=demo_suppliers)
+    return render_template('create_request.html', user=user, suppliers=demo_suppliers, remaining_budget=remaining_budget)
 
 @app.route('/requests/my')
 @login_required

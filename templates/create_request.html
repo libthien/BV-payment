@@ -10,6 +10,15 @@
     <p>Nhập thông tin yêu cầu thanh toán mới</p>
 </div>
 
+{% if remaining_budget is not none %}
+<div class="alert alert-info">
+    <strong>Thông tin ngân sách phòng ban:</strong> 
+    Còn lại: <span class="fw-bold">{{ format_currency(remaining_budget) }}</span> | 
+    Tổng ngân sách: <span class="fw-bold">{{ format_currency(total_budget) }}</span> | 
+    Đã sử dụng: <span class="fw-bold">{{ format_currency(used_budget) }}</span>
+</div>
+{% endif %}
+
 <div class="card">
     <div class="card-body">
         <form method="POST" enctype="multipart/form-data">
@@ -31,7 +40,7 @@
             
             <div class="mb-3">
                 <label class="form-label">Nội dung thanh toán <span class="text-danger">*</span></label>
-                <textarea name="content" class="form-control" rows="3" required placeholder="Mô tả nội dung thanh toán..."></textarea>
+                <textarea name="content" class="form-control" rows="3" required placeholder="Mô tả nội dung thanhoten..."></textarea>
             </div>
             
             <div class="row">
@@ -73,6 +82,8 @@
             <li>Sau khi HOD duyệt, yêu cầu sẽ chuyển sang Finance để phê duyệt cấp 2</li>
             <li>Tiếp theo sẽ qua CFO và Accounting để hoàn tất quy trình</li>
             <li>Bạn có thể theo dõi trạng thái yêu cầu trong mục "Yêu cầu của tôi"</li>
+            <li>Yêu cầu không thể vượt quá ngân sách phòng ban còn lại</li>
+            <li>Nếu số tiền vượt quá ngân sách còn lại, yêu cầu sẽ bị từ chối tự động</li>
         </ul>
     </div>
 </div>
