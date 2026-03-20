@@ -23,11 +23,7 @@
                 <h5 class="mb-1"><strong>{{ req.id }}</strong></h5>
                 <p class="mb-1 text-muted">{{ req.creator_name }} - {{ req.department }}</p>
             </div>
-            {% if req.get('is_special_request', False) %}
-                <span class="badge badge-status bg-danger text-white">YÊU CẦU ĐẶC BIỆT</span>
-            {% else %}
-                <span class="badge badge-status badge-warning">{{ get_status_label(req.status) }}</span>
-            {% endif %}
+            <span class="badge badge-status badge-warning">{{ get_status_label(req.status) }}</span>
         </div>
         <hr>
         <div class="row">
